@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LojaApi.Data;
@@ -7,6 +8,7 @@ namespace LojaApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProdutoController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -20,6 +22,19 @@ namespace LojaApi.Controllers
         public async Task<ActionResult<IEnumerable<Produto>>> Get()
         {
             return await _context.Produtos.ToListAsync();
+        }
+
+        [HttpGet("{codigo}")]
+        public async Task<ActionResult<Produto>> GetById(int codigo)
+        {
+            var produto = await _context.Produtos.FindAsync(codigo);
+
+            if (produto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(produto);
         }
 
         [HttpPost]
